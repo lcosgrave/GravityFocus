@@ -66,7 +66,7 @@ fun Timer(
                 }, modifier = Modifier
                     .wrapContentSize()
             ) {
-                if (timerRunning) {
+                if (timerRunning && time > 0) {
                     Text("Stop")
                 } else {
                     Text("Start")

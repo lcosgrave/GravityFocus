@@ -11,8 +11,12 @@ class UsageStatsHandler(context: Context) {
     private val usageStatsManager =
         context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     val excludedPackageNames = listOf<String>("android", "com.lauracosgrave.gravityfocus")
-    val excludedEvents =
-        listOf<Int>(12) // 12 = Notification created. Do we allow notifications to be viewed? Idk
+    val includedEvents =
+        listOf<Int>(
+            UsageEvents.Event.ACTIVITY_RESUMED,
+            UsageEvents.Event.USER_INTERACTION,
+            UsageEvents.Event.FOREGROUND_SERVICE_START
+        )
 
     fun checkForDisallowedUsage(timeIntervalMillis: Int): Boolean {
         val usageEvents = getUsageEvents(timeIntervalMillis)
@@ -52,7 +56,7 @@ class UsageStatsHandler(context: Context) {
         val filteredParsedEvents =
             parsedEvents.filter {
                 (it.packageName !in excludedPackageNames)
-                        && (it.eventType !in excludedEvents)
+                        && (it.eventType in includedEvents)
             } // don't get destroyed by notifications
         return filteredParsedEvents
     }

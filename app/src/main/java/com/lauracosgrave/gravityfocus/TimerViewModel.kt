@@ -27,6 +27,7 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
     private val _disallowedUsageHappened = MutableStateFlow(false)
     val disallowedUsageHappened: StateFlow<Boolean> get() = _disallowedUsageHappened
 
+    private var endTime: Long = 0
 
     private val usageStatsHandler = UsageStatsHandler(app.applicationContext)
     private var timerJob: Job? = null
@@ -50,11 +51,14 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
     fun startTimer() {
         cancelJobs()
         _timerRunning.value = true
+        endTime =
+            System.currentTimeMillis() + _startTimeMins.value * 60000 + 1000 // to account for integer division
+
         val startTimeEpochSecond = Instant.now().epochSecond
         timerJob = viewModelScope.launch {
             delay(1000)
             while (_timerRunning.value && time.value > 0) {
-                _time.value--
+                _time.value = (endTime - System.currentTimeMillis()).toInt() / 1000
                 delay(1000)
             }
             val endTimeEpochSecond = Instant.now().epochSecond
