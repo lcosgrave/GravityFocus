@@ -1,4 +1,4 @@
-package com.lauracosgrave.gravityfocus
+package com.lauracosgrave.gravityfocus.Timer
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

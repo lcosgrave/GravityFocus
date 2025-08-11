@@ -1,6 +1,5 @@
-package com.lauracosgrave.gravityfocus
+package com.lauracosgrave.gravityfocus.Timer
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lauracosgrave.gravityfocus.TimerViewModel
 
 
 @Composable
-fun TimerScreen(timerViewModel: TimerViewModel, context: Context, modifier: Modifier = Modifier) {
+fun TimerScreen(timerViewModel: TimerViewModel, modifier: Modifier = Modifier) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         val disallowedUsageHappened by timerViewModel.disallowedUsageHappened.collectAsState()
 
@@ -29,6 +29,7 @@ fun TimerScreen(timerViewModel: TimerViewModel, context: Context, modifier: Modi
         val startTimeMins by timerViewModel.startTimeMins.collectAsState()
         val time by timerViewModel.time.collectAsState()
         val timerRunning by timerViewModel.timerRunning.collectAsState()
+        val hasUsageStatsPermission by timerViewModel.hasUsageStatsPermission.collectAsState()
 
         Column(
             modifier = Modifier
@@ -50,9 +51,10 @@ fun TimerScreen(timerViewModel: TimerViewModel, context: Context, modifier: Modi
                 time,
                 timerRunning,
                 timerViewModel,
+                hasUsageStatsPermission,
                 { timerViewModel.stopTimer(); timerPickerDialogOpen = true; },
-                context,
-            )
+
+                )
         }
     }
 

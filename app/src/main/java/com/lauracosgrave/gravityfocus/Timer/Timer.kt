@@ -1,7 +1,8 @@
-package com.lauracosgrave.gravityfocus
+package com.lauracosgrave.gravityfocus.Timer
 
-import android.content.Context
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lauracosgrave.gravityfocus.TimerViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,12 +28,20 @@ fun Timer(
     time: Int,
     timerRunning: Boolean,
     timerViewModel: TimerViewModel,
+    hasUsageStatsPermission: Boolean,
     editStartTime: () -> Unit,
-    context: Context,
     modifier: Modifier = Modifier
 ) {
+    val settingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { timerViewModel.onPermissionResult() }
 
-    val permissionHandler = UsagePermissionHandler(context)
+    fun requestPermissionLauncher() {
+        val intent = timerViewModel.requestUsageStatsPermission()
+        if (intent != null) {
+            settingsLauncher.launch(intent)
+        }
+    }
 
     Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -46,11 +56,11 @@ fun Timer(
             }
             Button(
                 onClick = {
-                    if (permissionHandler.checkHasPermission()) {
+                    if (hasUsageStatsPermission) {
                         timerViewModel.startOrStopTimer()
                         Log.d("TimerScreen", "time: ${time}")
                     } else {
-                        permissionHandler.requestPermission()
+                        requestPermissionLauncher()
                     }
 
                 }, modifier = Modifier
@@ -68,8 +78,9 @@ fun Timer(
                     timerViewModel.stopTimer()
                     timerViewModel.resetTimer()
                     Log.d("TimerScreen", "time: ${time}")
-                }, modifier = Modifier
-                    .wrapContentSize()
+                },
+                modifier = Modifier
+                    .wrapContentSize(),
             ) {
                 Text("Reset")
             }
@@ -84,3 +95,4 @@ fun displayTime(totalSeconds: Int): String {
 
     return String.format(Locale.UK, "%02d:%02d:%02d", hours, minutes, seconds)
 }
+
