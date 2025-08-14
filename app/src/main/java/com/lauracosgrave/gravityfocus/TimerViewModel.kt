@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
+import kotlin.math.max
 
 class TimerViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -58,7 +59,7 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
         timerJob = viewModelScope.launch {
             delay(1000)
             while (_timerRunning.value && time.value > 0) {
-                _time.value = (endTime - System.currentTimeMillis()).toInt() / 1000
+                _time.value = max((endTime - System.currentTimeMillis()).toInt() / 1000, 0)
                 delay(1000)
             }
             val endTimeEpochSecond = Instant.now().epochSecond
